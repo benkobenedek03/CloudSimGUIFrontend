@@ -18,4 +18,8 @@ export class App {
     this.viewtype=view
   }
 
+  SwitchToResults(){
+    this.ChangeView(ViewTypes.result)
+  }
+
 }
