@@ -1,1 +1,28 @@
-<p>detailed-request works!</p>
+<form
+  (ngSubmit)="SendRequest()"
+  class="w-full max-w-2xl mx-auto my-10"
+>
+  <div class="form-control">
+    <label class="label py-1">
+      <span class="label-text text-l font-bold">
+        Detailed config
+      </span>
+    </label>
+
+    <textarea
+      name="detailedConfig"
+      [(ngModel)]="config"
+      placeholder="Enter detailed configuration..."
+      class="textarea textarea-bordered w-full h-48 resize-y"
+    ></textarea>
+  </div>
+
+  <div class="flex justify-center mt-5">
+    <button
+      type="submit"
+      class="btn btn-primary btn-sm w-full"
+    >
+      Submit
+    </button>
+  </div>
+</form>
