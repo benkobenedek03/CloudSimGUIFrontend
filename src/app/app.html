@@ -1,0 +1,17 @@
+<div class="flex gap-2 my-8 justify-center">
+  <button class="btn btn-primary mx-12" (click)="ChangeView(ViewTypes.simple)">
+    Request
+  </button>
+
+  <button class="btn btn-primary  mx-12" (click)="ChangeView(ViewTypes.detailed)">
+    Detailed
+  </button>
+
+  <button class="btn btn-primary  mx-12" (click)="ChangeView(ViewTypes.result)">
+    Results
+  </button>
+</div>
+
+@if (viewtype==ViewTypes.simple) {<app-simple-request></app-simple-request>}
+@if (viewtype==ViewTypes.detailed) {<app-detailed-request/>}
+@if (viewtype==ViewTypes.result) {<app-result></app-result>}
