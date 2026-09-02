@@ -12,6 +12,6 @@
   </button>
 </div>
 
-@if (viewtype==ViewTypes.simple) {<app-simple-request></app-simple-request>}
-@if (viewtype==ViewTypes.detailed) {<app-detailed-request/>}
+@if (viewtype==ViewTypes.simple) {<app-simple-request (submitted)="SwitchToResults()"></app-simple-request>}
+@if (viewtype==ViewTypes.detailed) {<app-detailed-request (submitted)="SwitchToResults()"/>}
 @if (viewtype==ViewTypes.result) {<app-result></app-result>}

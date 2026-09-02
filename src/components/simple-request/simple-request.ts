@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,EventEmitter, Output, output } from '@angular/core';
 import { FormsModule } from "@angular/forms";
 import { SimpleRequestDTO } from '../../Models/simple-request';
 
@@ -10,8 +10,9 @@ import { SimpleRequestDTO } from '../../Models/simple-request';
 })
 export class SimpleRequest {
   simpleReq:SimpleRequestDTO={} as SimpleRequestDTO
-
+  @Output() submitted = new EventEmitter<void>();
   SendRequest(){
     console.log(this.simpleReq)
+    this.submitted.emit();
   }
 }

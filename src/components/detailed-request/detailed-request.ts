@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -9,8 +9,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class DetailedRequest {
   config:string=""
+  @Output() submitted=new EventEmitter<void>();
   SendRequest()
   {
-    
+    //todo service api call
+    this.submitted.emit();
   }
 }
