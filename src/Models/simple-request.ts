@@ -1,7 +1,7 @@
-export interface SimpleRequest {
+export interface SimpleRequestDTO {
     NumberOfHosts:number,
     NumberOfDatacenters:number,
     NumberOfVMs:number,
     NumberOfCloudlets:number,
-    Schedueler:string
+    Scheduler:string
 }

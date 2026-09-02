@@ -1,4 +1,4 @@
-<form class="w-full max-w-2xl mx-auto my-10">
+<form (ngSubmit)="SendRequest()" class="w-full max-w-2xl mx-auto my-10">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
     <div class="form-control">
@@ -6,6 +6,8 @@
         <span class="label-text text-xs">Number of datacenters</span>
       </label>
       <input
+      name="numberOfDatacenters"
+      [(ngModel)]="simpleReq.NumberOfDatacenters"
       min="1"
         type="number"
         placeholder="Number of datacenters"
@@ -18,6 +20,8 @@
         <span class="label-text text-xs">Number of host</span>
       </label>
       <input
+      name="numberOfHosts"    
+      [(ngModel)]="simpleReq.NumberOfHosts"
       min="1"
         type="number"
         placeholder="Number of host"
@@ -30,6 +34,8 @@
         <span class="label-text text-xs">Number of VMs</span>
       </label>
       <input
+      name="numberOfVMs"
+      [(ngModel)]="simpleReq.NumberOfVMs"
       min="1"
         type="number"
         placeholder="Number of VMs"
@@ -42,6 +48,8 @@
         <span class="label-text text-xs">Number of cloudlets</span>
       </label>
       <input
+      name="numberOfCloudlets"
+      [(ngModel)]="simpleReq.NumberOfCloudlets"
         min="1"
         type="number"
         placeholder="Number of cloudlets"
@@ -53,7 +61,9 @@
       <label class="label py-1">
         <span class="label-text text-xs">Scheduler</span>
       </label>
-      <select class="select select-bordered select-sm w-full">
+      <select
+      name="scheduler"
+      [(ngModel)]="simpleReq.Scheduler" class="select select-bordered select-sm w-full">
         <option disabled selected>Select a scheduler</option>
         <option>Option 1</option>
         <option>Option 2</option>
@@ -64,7 +74,7 @@
   </div>
 
   <div class="flex justify-center mt-5">
-    <button (click)="SendRequest()" type="submit" class="btn btn-primary btn-m w-2xl">
+    <button type="submit" class="btn btn-primary btn-m w-2xl">
       Send
     </button>
   </div>

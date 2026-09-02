@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
+import { FormsModule } from "@angular/forms";
+import { SimpleRequestDTO } from '../../Models/simple-request';
 
 @Component({
   selector: 'app-simple-request',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './simple-request.html',
   styleUrl: './simple-request.css',
 })
 export class SimpleRequest {
-  private simpleReq:SimpleRequest={} as SimpleRequest
-  
-  SendRequest(){}
+  simpleReq:SimpleRequestDTO={} as SimpleRequestDTO
+
+  SendRequest(){
+    console.log(this.simpleReq)
+  }
 }
