@@ -1,15 +1,3 @@
-<div class="flex gap-2 my-8 justify-center">
-  <button routerLink="/simple" class="btn btn-primary mx-12" (click)="ChangeView(ViewTypes.simple)">
-    Simple config
-  </button>
-
-  <button routerLink="/detailed" class="btn btn-primary  mx-12" (click)="ChangeView(ViewTypes.detailed)">
-    Detailed config
-  </button>
-
-  <button routerLink="/results" class="btn btn-primary  mx-12" (click)="ChangeView(ViewTypes.result)">
-    Results
-  </button>
-</div>
+<app-nav/>
 
 <router-outlet></router-outlet>

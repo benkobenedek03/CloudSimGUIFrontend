@@ -4,10 +4,11 @@ import { DetailedRequest } from '../components/detailed-request/detailed-request
 import { Result } from '../components/result/result';
 import { ViewTypes } from '../Models/view-types';
 import { RouterLink, RouterOutlet } from "@angular/router";
+import { Nav } from "../components/nav/nav";
 
 @Component({
   selector: 'app-root',
-  imports: [SimpleRequest, DetailedRequest, Result, RouterLink, RouterOutlet],
+  imports: [SimpleRequest, DetailedRequest, Result, RouterLink, RouterOutlet, Nav],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
