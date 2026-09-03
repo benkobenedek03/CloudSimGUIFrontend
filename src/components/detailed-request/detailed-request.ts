@@ -1,5 +1,6 @@
-import { Component,EventEmitter, Output } from '@angular/core';
+import { Component,EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-detailed-request',
@@ -9,10 +10,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class DetailedRequest {
   config:string=""
-  @Output() submitted=new EventEmitter<void>();
+  router = inject(Router)
   SendRequest()
   {
     //todo service api call
-    this.submitted.emit();
+    this.router.navigate(['/results'])
   }
 }
