@@ -17,20 +17,7 @@ export class RequestService {
   }
   
   pollRequest(id: string): Observable<RequestStatus> {
-
-    const mockResponse: RequestStatus = {
-      id: id,
-      status: Status.completed
-      
-    };
-
-    return of(mockResponse).pipe(
-      delay(5000)
-    );
-
-
-
-    /*return timer(0, 2000).pipe(
+    return timer(0, 2000).pipe(
       switchMap(() =>
         this.http.get<RequestStatus>(
           `${this.url}/requests/${id}`
@@ -43,6 +30,6 @@ export class RequestService {
         true
       )
     );
-  }*/
+  }
 }
-}
+
