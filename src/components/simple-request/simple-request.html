@@ -61,3 +61,9 @@
         </button>
       </div>
 </form>}
+@if (successPopupVisible()) {
+  <app-successpopup [message]="message" (closeEvent)="closePopups()" />
+}
+@if (alertPopupVisible()) {
+  <app-alertpopup [message]="message" (closeEvent)="closePopups()" />
+}
