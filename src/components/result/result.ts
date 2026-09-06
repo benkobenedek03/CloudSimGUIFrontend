@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { RequestService } from '../../services/request-service';
 
 @Component({
   selector: 'app-result',
@@ -6,4 +7,9 @@ import { Component } from '@angular/core';
   templateUrl: './result.html',
   styleUrl: './result.css',
 })
-export class Result {}
+export class Result {
+  jobId=input.required<string>()
+  service = inject(RequestService)
+
+  
+}

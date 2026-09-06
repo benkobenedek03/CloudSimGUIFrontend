@@ -1,4 +1,4 @@
-@if (loading) {
+@if (loading()) {
     <div class="loading-screen">
         <div class="spinner"></div>
 
@@ -6,60 +6,94 @@
     <p>Please wait.</p>
   </div>
 } @else{
-    <form (ngSubmit)="SendRequest()" class="w-full max-w-2xl mx-auto my-10">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+<form (ngSubmit)="SendRequest()" class="w-full max-w-2xl mx-auto my-10">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
 
-        <div class="form-control">
-          <label class="label py-1">
-            <span class="label-text text-xs">Number of datacenters</span>
-          </label>
-          <input name="numberOfDatacenters" [(ngModel)]="simpleReq.NumberOfDatacenters" min="1" type="number"
-            placeholder="Number of datacenters" class="input input-bordered input-sm w-full" />
-        </div>
+    <div class="form-control">
+      <label class="label py-1">
+        <span class="label-text text-xs">Number of datacenters</span>
+      </label>
+      <input
+        name="datacenterCount"
+        [(ngModel)]="simpleReq.datacenterCount"
+        min="1"
+        type="number"
+        placeholder="Number of datacenters"
+        class="input input-bordered input-sm w-full"
+        required
+      />
+    </div>
 
-        <div class="form-control">
-          <label class="label py-1">
-            <span class="label-text text-xs">Number of host</span>
-          </label>
-          <input name="numberOfHosts" [(ngModel)]="simpleReq.NumberOfHosts" min="1" type="number"
-            placeholder="Number of host" class="input input-bordered input-sm w-full" />
-        </div>
+    <div class="form-control">
+      <label class="label py-1">
+        <span class="label-text text-xs">Number of hosts</span>
+      </label>
+      <input
+        name="hostCount"
+        [(ngModel)]="simpleReq.hostCount"
+        min="1"
+        type="number"
+        placeholder="Number of hosts"
+        class="input input-bordered input-sm w-full"
+        required
+      />
+    </div>
 
-        <div class="form-control">
-          <label class="label py-1">
-            <span class="label-text text-xs">Number of VMs</span>
-          </label>
-          <input name="numberOfVMs" [(ngModel)]="simpleReq.NumberOfVMs" min="1" type="number" placeholder="Number of VMs"
-            class="input input-bordered input-sm w-full" />
-        </div>
+    <div class="form-control">
+      <label class="label py-1">
+        <span class="label-text text-xs">Number of VMs</span>
+      </label>
+      <input
+        name="vmCount"
+        [(ngModel)]="simpleReq.vmCount"
+        min="1"
+        type="number"
+        placeholder="Number of VMs"
+        class="input input-bordered input-sm w-full"
+        required
+      />
+    </div>
 
-        <div class="form-control">
-          <label class="label py-1">
-            <span class="label-text text-xs">Number of cloudlets</span>
-          </label>
-          <input name="numberOfCloudlets" [(ngModel)]="simpleReq.NumberOfCloudlets" min="1" type="number"
-            placeholder="Number of cloudlets" class="input input-bordered input-sm w-full" />
-        </div>
+    <div class="form-control">
+      <label class="label py-1">
+        <span class="label-text text-xs">Number of cloudlets</span>
+      </label>
+      <input
+        name="cloudletCount"
+        [(ngModel)]="simpleReq.cloudletCount"
+        min="1"
+        type="number"
+        placeholder="Number of cloudlets"
+        class="input input-bordered input-sm w-full"
+        required
+      />
+    </div>
 
-        <div class="form-control md:col-span-2">
-          <label class="label py-1">
-            <span class="label-text text-xs">Scheduler</span>
-          </label>
-          <select name="scheduler" [(ngModel)]="simpleReq.Scheduler" class="select select-bordered select-sm w-full">
-            <option disabled selected>Select a scheduler</option>
-            <option>Option 1</option>
-            <option>Option 2</option>
-            <option>Option 3</option>
-          </select>
-        </div>
+    <div class="form-control md:col-span-2">
+      <label class="label py-1">
+        <span class="label-text text-xs">Scheduler</span>
+      </label>
+      <select
+        name="schedulingPolicy"
+        [(ngModel)]="simpleReq.schedulingPolicy"
+        class="select select-bordered select-sm w-full"
+      >
+        <option [ngValue]="undefined" disabled>Select a scheduler</option>
+        <option value="TIME_SHARED">TIME_SHARED</option>
+        <option value="SPACE_SHARED">SPACE_SHARED</option>
+      </select>
+    </div>
 
-      </div>
+  </div>
 
-      <div class="flex justify-center mt-5">
-        <button type="submit" class="btn bg-linear-to-r from-blue-500 to-purple-500 btn-primary btn-m w-2xl">
-          Send
-        </button>
-      </div>
+  <div class="flex justify-center mt-5">
+    <button
+      type="submit"
+      class="btn bg-gradient-to-r from-blue-500 to-purple-500 btn-primary btn-md w-full max-w-2xl text-white"
+    >
+      Send
+    </button>
+  </div>
 </form>}
 @if (successPopupVisible()) {
   <app-successpopup [message]="message" (closeEvent)="closePopups()" />
