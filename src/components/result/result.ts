@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import { RequestService } from '../../services/request-service';
 
 @Component({
@@ -7,9 +7,18 @@ import { RequestService } from '../../services/request-service';
   templateUrl: './result.html',
   styleUrl: './result.css',
 })
-export class Result {
-  jobId=input.required<string>()
+export class Result implements OnInit {
+  ngOnInit(): void {
+    if (this.jobId()) {
+      this.service.getResult(this.jobId()).subscribe({
+        next:result=>{console.log(result)},
+        error:error=>console.log(error)
+      })
+    }
+  }
+  jobId=input<string>()
   service = inject(RequestService)
 
+  
   
 }

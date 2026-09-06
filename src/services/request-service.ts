@@ -5,6 +5,7 @@ import { delay, Observable, of, switchMap, takeWhile, timer,map } from 'rxjs';
 import { RequestStatus } from '../Models/request-status';
 import { Status } from '../Models/status';
 import { SimulationRequestDto } from '../Models/simulation-request-dto';
+import { ResultDto } from '../Models/simulation-result-dto';
 
 
 @Injectable({
@@ -36,8 +37,8 @@ export class RequestService {
     );
   }
 
-  getResult(id:string){
-    this.http.get(this.url+"/result/"+id)
+  getResult(id:string | undefined){
+    return this.http.get<ResultDto>(this.url+"/result/"+id)
   }
 }
 
