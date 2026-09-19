@@ -1,12 +1,14 @@
-import { Component,EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component,EventEmitter, inject, OnInit, Output, Signal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RequestService } from '../../services/request-service';
+import { Successpopup } from "../popups/successpopup/successpopup";
+import { Alertpopup } from "../popups/alertpopup/alertpopup";
 
 
 @Component({
   selector: 'app-detailed-request',
-  imports: [FormsModule],
+  imports: [FormsModule, Successpopup, Alertpopup],
   templateUrl: './detailed-request.html',
   styleUrl: './detailed-request.css',
 })
@@ -108,10 +110,30 @@ export class DetailedRequest implements OnInit {
   service = inject(RequestService)
   loading=false
 
+  //popup
+  alertPopupVisible = signal(false)
+  successPopupVisible = signal(false)
+  popupMessage = ""
+
+  showPopup(popup:WritableSignal<boolean>){
+    popup.set(true)
+    
+    setInterval(()=>{
+      popup.set(false)
+    },5000)
+  }
+
+  closePopups(){
+    this.alertPopupVisible.set(false)
+    this.successPopupVisible.set(false)
+  }
 
   ngOnInit(): void {
     this.configString=JSON.stringify(this.defaultTemplate,null,2)
   }
+
+
+
   SendRequest()
   {
     this.loading = true
@@ -119,12 +141,18 @@ export class DetailedRequest implements OnInit {
     this.service.pollRequest('a').subscribe({
       next:response=>{
         this.loading=false
+        this.popupMessage="Simulation started"
+        this.showPopup(this.successPopupVisible)
         console.log(response)
-        this.router.navigate(['/results'])
+        setInterval(() => {
+          this.router.navigate(['/results'])
+        }, 3000);
       },
       error: error => {
         console.log(error)
+        this.popupMessage="Something went wrong. Try again!"
         this.loading = false;
+        this.showPopup(this.alertPopupVisible)
       }
     })
     //todo service api call

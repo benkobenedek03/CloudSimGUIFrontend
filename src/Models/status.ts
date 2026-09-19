@@ -1,3 +1,3 @@
 export enum Status {
-    pending,inprogress,failed,completed
+    Pending,InProgress,Completed,Failed,Not_Found
 }
