@@ -1,0 +1,439 @@
+@if (isLoading()) {
+    <div class="loading-screen">
+        <div class="spinner"></div>
+
+        <h2>Processing your request...</h2>
+    <p>Please wait.</p>
+  </div>
+} @else{
+<!-- Fő konténer: Teljes képernyő, szürke háttér -->
+<div class="flex h-screen bg-base-200 overflow-hidden font-sans">
+
+    <!-- BAL SÁV: Paletta -->
+    <div class="w-80 bg-base-100 p-6 shadow-xl z-10 flex flex-col gap-4 overflow-y-auto">
+        <div>
+            <h2 class="text-2xl font-bold text-base-content">Eszköztár</h2>
+            <p class="text-sm text-base-content/70 mt-1">Húzd be a megfelelő elemeket a munkaterületre.</p>
+        </div>
+
+        <div class="divider my-0"></div>
+
+        <!-- Paletta ejtési zóna -->
+        <div cdkDropList id="palette" [cdkDropListData]="hostPalette" [cdkDropListConnectedTo]="datacenterDropZoneIds"
+            class="flex flex-col gap-3 min-h-24">
+
+            @for (h of hostPalette; track h) {
+            <div cdkDrag
+                class="card bg-base-100 shadow-md border border-base-300 border-l-4 border-l-primary cursor-grab active:cursor-grabbing hover:shadow-lg transition-all">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-sm m-0">Fizikai Host</h3>
+                    <p class="text-xs text-base-content/70">{{h.pes}} Mag | {{h.ram}} MB RAM</p>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- JOBB SÁV: Munkaterület (Infrastruktúra és Workload) -->
+    <div class="flex-1 p-8 overflow-y-auto flex flex-col gap-8">
+
+        <!-- ZÓNA 1: INFRASTRUKTÚRA -->
+        <section class="bg-base-100 rounded-box p-6 shadow-sm border border-base-300">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">1. Fizikai Infrastruktúra (Datacenters)</h2>
+                    <p class="text-sm text-base-content/60">Építsd fel az adatközpontokat és a fizikai gépeket.</p>
+                </div>
+                <button (click)="addDatacenter()" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Új Adatközpont
+                </button>
+            </div>
+
+            <div class="flex gap-6 overflow-x-auto pb-4">
+                @for (dc of datacenters; track dc.name; let i = $index) {
+                <!-- Adatközpont Kártya -->
+                <div class="card bg-base-200 w-96 shadow-inner border border-base-300 shrink-0">
+                    <div class="card-body p-4">
+                        <div class="flex justify-between items-center mb-2 border-b border-base-300 pb-2">
+                            <h3 class="card-title text-lg m-0">{{dc.name}}</h3>
+                            <button (click)="openDatacenterSettings(dc)"
+                                class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left"
+                                data-tip="Adatközpont Költségek">
+                                ⚙️
+                            </button>
+                        </div>
+                        <!-- EZ A DROP ZONE: Ide lehet ejteni a Hostokat -->
+                        <div cdkDropList [id]="'dc-' + i" [cdkDropListData]="dc.hosts"
+                            (cdkDropListDropped)="dropHost($event)"
+                            class="bg-base-100/50 rounded-box min-h-32 border-2 border-dashed border-base-300 p-3 flex flex-col gap-2">
+
+                            @for (host of dc.hosts; track host) {
+                            <!-- Belső Host Kártya -->
+                            <div cdkDrag
+                                class="card bg-base-100 shadow-sm border border-base-200 border-l-4 border-l-success cursor-grab active:cursor-grabbing">
+                                <div class="p-3 flex justify-between items-center">
+                                    <div class="text-sm">
+                                        <span class="font-bold block">Host</span>
+                                        <span class="text-xs text-base-content/70">{{host.pes}} PEs | {{host.ram}}
+                                            RAM</span>
+                                    </div>
+                                    <!-- Haladó gomb (Ghost button) -->
+                                    <button (click)="openHostSettings(host)"
+                                        class="btn btn-ghost btn-xs btn-circle tooltip tooltip-left"
+                                        data-tip="Haladó beállítások">
+                                        ⚙️
+                                    </button>
+                                </div>
+                            </div>
+                            } @empty {
+                            <div
+                                class="flex items-center justify-center h-full text-sm text-base-content/40 text-center my-8">
+                                Húzz ide egy Hostot a bal oldali palettáról!
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- ZÓNA 2: WORKLOAD (BROKER) -->
+        <section class="bg-base-100 rounded-box p-6 shadow-sm border border-base-300">
+            <div class="mb-4">
+                <h2 class="text-xl font-bold">2. Logikai Terhelés (Broker)</h2>
+                <p class="text-sm text-base-content/60">Definiáld a virtuális gépeket és az elvégzendő feladatokat.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Virtuális gépek listája -->
+                <div class="card bg-base-200 border border-base-300">
+                    <div class="card-body p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold">Virtuális Gépek (VMs)</h4>
+                            <button (click)="addVm()" class="btn btn-secondary btn-xs">+ Új VM</button>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            @for (vm of vms; track vm.id) {
+                            <div
+                                class="card bg-base-100 shadow-sm border-l-4 border-l-warning p-3 flex flex-row justify-between items-center">
+                                <div>
+                                    <span class="text-sm font-semibold block">VM ID: {{vm.id}}</span>
+                                    <span class="text-xs text-base-content/70">{{vm.pes}} Mag | {{vm.ram}} MB RAM</span>
+                                </div>
+                                <!-- A Haladó beállítások gomb -->
+                                <button (click)="openVmSettings(vm)"
+                                    class="btn btn-ghost btn-xs btn-circle tooltip tooltip-left"
+                                    data-tip="VM Paraméterek">
+                                    ⚙️
+                                </button>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cloudletek listája -->
+                <div class="card bg-base-200 border border-base-300">
+                    <div class="card-body p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold">Feladatok (Cloudlets)</h4>
+                            <button (click)="addCloudlet()" class="btn btn-accent btn-xs">+ Új Cloudlet</button>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            @for (cl of cloudlets; track cl.id) {
+                            <div
+                                class="card bg-base-100 shadow-sm border-l-4 border-l-warning p-3 flex flex-row justify-between items-center">
+                                <span class="text-sm font-semibold block">Cloudlet ID: {{cl.id}}</span>
+                                <span class="text-xs text-base-content/70">Hossz: {{cl.length}} MI</span>
+
+                                <button (click)="openCloudletSettings(cl)"
+                                    class="btn btn-ghost btn-xs btn-circle tooltip tooltip-left"
+                                    data-tip="Cloudlet Paraméterek">
+                                    ⚙️
+                                </button>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- START GOMB -->
+        <div class="flex justify-end mt-4 pb-8">
+            <button (click)="startSimulation()"
+                class="btn btn-success btn-lg shadow-lg shadow-success/30 hover:scale-105 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Szimuláció Indítása
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- DAISY-UI MODAL: Haladó Host Beállítások -->
+<dialog #hostModal class="modal">
+    <div class="modal-box w-11/12 max-w-2xl bg-base-100">
+        <h3 class="font-bold text-xl mb-6 border-b border-base-200 pb-2">Haladó Host Beállítások</h3>
+
+        <!-- Angular Reactive Form összekötése -->
+        <form [formGroup]="hostForm" (ngSubmit)="saveHostSettings()">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- CPU Magok -->
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">CPU Magok (PEs)</span></label>
+                    <input type="number" formControlName="pes" class="input input-bordered w-full" />
+                </div>
+
+                <!-- MIPS -->
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">MIPS / Mag</span></label>
+                    <input type="number" formControlName="mips" class="input input-bordered w-full" />
+                </div>
+
+                <!-- RAM -->
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">RAM (MB)</span></label>
+                    <input type="number" formControlName="ram" class="input input-bordered w-full" />
+                </div>
+
+                <!-- Sávszélesség -->
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">Sávszélesség (BW)</span></label>
+                    <input type="number" formControlName="bw" class="input input-bordered w-full" />
+                </div>
+
+                <!-- Tárhely -->
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label"><span class="label-text font-semibold">Tárhely kapacitás (MB)</span></label>
+                    <input type="number" formControlName="storage" class="input input-bordered w-full" />
+                </div>
+
+                <!-- Dinamikus VM Ütemező (Strategy Pattern a backendhez) -->
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label">
+                        <span class="label-text font-semibold">VM Ütemező (VmScheduler)</span>
+                        <span class="label-text-alt text-info">A CloudSim algoritmus</span>
+                    </label>
+                    <select formControlName="vmScheduler" class="select select-bordered w-full">
+                        <option value="TimeShared">Time-Shared (Időosztásos)</option>
+                        <option value="SpaceShared">Space-Shared (Térosztásos)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Gombok (Action bar) -->
+            <div class="modal-action mt-8">
+                <!-- type="button" fontos, különben a Mégse gomb is elküldené a formot! -->
+                <button type="button" class="btn btn-ghost" (click)="closeModal()">Mégse</button>
+                <button type="submit" class="btn btn-primary" [disabled]="!hostForm.valid">💾 Beállítások
+                    Mentése</button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Ez teszi lehetővé, hogy az ablak mellé kattintva is bezáródjon -->
+    <form method="dialog" class="modal-backdrop">
+        <button (click)="closeModal()">bezárás</button>
+    </form>
+</dialog>
+<dialog #vmModal class="modal">
+    <div class="modal-box w-11/12 max-w-2xl bg-base-100 border-t-4 border-warning">
+        <h3 class="font-bold text-xl mb-6 border-b border-base-200 pb-2">Virtuális Gép (VM) Beállítások</h3>
+
+        <form [formGroup]="vmForm" (ngSubmit)="saveVmSettings()">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">CPU Magok (PEs)</span></label>
+                    <input type="number" formControlName="pes" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">MIPS / Mag</span></label>
+                    <input type="number" formControlName="mips" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">RAM (MB)</span></label>
+                    <input type="number" formControlName="ram" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">Sávszélesség (Mbps)</span></label>
+                    <input type="number" formControlName="bw" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">Képfájl mérete (MB)</span></label>
+                    <input type="number" formControlName="size" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Belső Ütemező</span>
+                        <span class="label-text-alt text-info">CloudletScheduler</span>
+                    </label>
+                    <select formControlName="cloudletScheduler" class="select select-bordered w-full">
+                        <option value="TimeShared">Time-Shared</option>
+                        <option value="SpaceShared">Space-Shared</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="modal-action mt-8">
+                <button type="button" class="btn btn-ghost" (click)="closeVmModal()">Mégse</button>
+                <button type="submit" class="btn btn-warning" [disabled]="!vmForm.valid">💾 Mentés</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button (click)="closeVmModal()">bezárás</button></form>
+</dialog>
+
+<dialog #cloudletModal class="modal">
+    <div class="modal-box w-11/12 max-w-lg bg-base-100 border-t-4 border-accent">
+        <h3 class="font-bold text-xl mb-6 border-b border-base-200 pb-2">Feladat (Cloudlet) Beállítások</h3>
+
+        <form [formGroup]="cloudletForm" (ngSubmit)="saveCloudletSettings()">
+            <div class="grid grid-cols-1 gap-4">
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Feladat hossza (MI)</span>
+                        <span class="label-text-alt">Millió Utasítás</span>
+                    </label>
+                    <input type="number" formControlName="length" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label"><span class="label-text font-semibold">Igényelt CPU Magok (PEs)</span></label>
+                    <input type="number" formControlName="pes" class="input input-bordered w-full" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                        <label class="label"><span class="label-text font-semibold">Bemeneti fájl (MB)</span></label>
+                        <input type="number" formControlName="fileSize" class="input input-bordered w-full" />
+                    </div>
+
+                    <div class="form-control w-full">
+                        <label class="label"><span class="label-text font-semibold">Kimeneti fájl (MB)</span></label>
+                        <input type="number" formControlName="outputSize" class="input input-bordered w-full" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-action mt-8">
+                <button type="button" class="btn btn-ghost" (click)="closeCloudletModal()">Mégse</button>
+                <button type="submit" class="btn btn-accent" [disabled]="!cloudletForm.valid">💾 Mentés</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button (click)="closeCloudletModal()">bezárás</button></form>
+</dialog>
+<dialog #datacenterModal class="modal">
+    <div class="modal-box w-11/12 max-w-2xl bg-base-100 border-t-4 border-info">
+        <h3 class="font-bold text-xl mb-6 border-b border-base-200 pb-2">Adatközpont Költségmodellezés</h3>
+
+        <form [formGroup]="datacenterForm" (ngSubmit)="saveDatacenterSettings()">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="form-control w-full md:col-span-2 mb-2">
+                    <label class="label"><span class="label-text font-semibold">Adatközpont Neve</span></label>
+                    <input type="text" formControlName="name" class="input input-bordered w-full font-bold" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Másodperc alapú költség ($)</span>
+                        <span class="label-text-alt text-base-content/60">costPerSec</span>
+                    </label>
+                    <input type="number" step="0.01" formControlName="costPerSec" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Memória költség / MB ($)</span>
+                        <span class="label-text-alt text-base-content/60">costPerMem</span>
+                    </label>
+                    <input type="number" step="0.01" formControlName="costPerMem" class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Tárhely költség / MB ($)</span>
+                        <span class="label-text-alt text-base-content/60">costPerStorage</span>
+                    </label>
+                    <input type="number" step="0.001" formControlName="costPerStorage"
+                        class="input input-bordered w-full" />
+                </div>
+
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text font-semibold">Sávszélesség költség / Mbps ($)</span>
+                        <span class="label-text-alt text-base-content/60">costPerBw</span>
+                    </label>
+                    <input type="number" step="0.01" formControlName="costPerBw" class="input input-bordered w-full" />
+                </div>
+
+            </div>
+
+            <div class="modal-action mt-8">
+                <button type="button" class="btn btn-ghost" (click)="closeDatacenterModal()">Mégse</button>
+                <button type="submit" class="btn btn-info text-white" [disabled]="!datacenterForm.valid">💾
+                    Mentés</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button (click)="closeDatacenterModal()">bezárás</button></form>
+</dialog>
+
+
+<dialog #errorModal class="modal">
+  <div class="modal-box bg-base-100 border-t-4 border-error shadow-2xl">
+    
+    <h3 class="font-bold text-xl text-error flex items-center gap-2 border-b border-base-200 pb-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-7 w-7" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      Sikertelen Szimuláció
+    </h3>
+    
+    <div class="py-4">
+      <p class="text-base-content/80 font-semibold mb-2">A szerver az alábbi hibával utasította el a kérést:</p>
+      
+
+      <div class="bg-base-200 p-4 rounded-box font-mono text-sm text-error overflow-x-auto">
+        {{ errorMessage }}
+      </div>
+    </div>
+    
+    <div class="modal-action">
+      <button class="btn btn-error text-white w-32" (click)="closeErrorModal()">Értem</button>
+    </div>
+  </div>
+  
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeErrorModal()">bezárás</button>
+  </form>
+</dialog>
+}
