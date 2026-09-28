@@ -1,68 +1,148 @@
-<div class="w-full max-w-6xl mx-auto my-10">
-
-  <h2 class="text-lg font-bold mb-6">
-    Results
-  </h2>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <div class="card bg-base-100 shadow-sm border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-sm">
-          CPU Utilization
-        </h3>
-
-        <div class="h-64 flex items-center justify-center">
-          <!-- Chart goes here -->
-          <div class="text-sm text-base-content/50">
-            CPU graph
+<div class="p-8 bg-base-200 min-h-screen font-sans flex flex-col gap-8 items-center justify-center">
+  @if (isLoading) {
+    <div class="flex flex-col items-center gap-6 animate-pulse">
+      <span class="loading loading-infinity loading-lg text-primary w-24"></span>
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-base-content">Szimuláció végrehajtása folyamatban...</h2>
+        <p class="text-base-content/70 mt-2">A CloudSim motor építi a felhő infrastruktúrát és futtatja a feladatokat.</p>
+      </div>
+      <div class="badge badge-outline badge-lg mt-2 font-mono">Job ID: {{jobId}}</div>
+    </div>
+  }
+  @else if (errorMessage) {
+    <div class="alert alert-error shadow-lg max-w-2xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-8 w-8" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold text-lg">Hiba történt a kiértékelés során!</h3>
+        <div class="text-sm mt-1">{{ errorMessage }}</div>
+      </div>
+      <!-- Vissza a tervezőbe (Feltételezi, hogy a Builder az alap '/') -->
+      <button class="btn btn-sm" routerLink="/">Vissza a tervezőbe</button>
+    </div>
+  }
+  @else if (resultData) {
+    <div class="w-full flex flex-col gap-8 fade-in">
+      
+      <!-- Fejléc -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-3xl font-bold text-base-content">Szimulációs Eredményjelentés</h2>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="badge badge-success font-bold">Sikeres futás</span>
+            <span class="text-sm text-base-content/60 font-mono">ID: {{resultData.jobId}}</span>
           </div>
         </div>
+        <button routerLink="/" class="btn btn-outline btn-primary shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Új szimuláció indítása
+        </button>
       </div>
-    </div>
 
-    <div class="card bg-base-100 shadow-sm border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-sm">
-          Memory Usage
-        </h3>
+      <!-- KPI KÁRTYÁK (daisyUI Stats) -->
+      <div class="stats stats-vertical lg:stats-horizontal shadow-md w-full border border-base-300">
+        
+        <div class="stat">
+          <div class="stat-figure text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="stat-title">Teljes Futási Idő (Makespan)</div>
+          <div class="stat-value text-primary">{{resultData.totalExecutionTime | number:'1.2-2'}}s</div>
+          <div class="stat-desc mt-1">A szimuláció teljes hossza</div>
+        </div>
+        
+        <div class="stat">
+          <div class="stat-figure text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="stat-title">Teljes CPU Költség</div>
+          <div class="stat-value text-secondary">${{resultData.totalCpuCost | number:'1.4-4'}}</div>
+          <div class="stat-desc mt-1">Számlázott számítási kapacitás</div>
+        </div>
+        
+        <div class="stat">
+          <div class="stat-figure text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="stat-title">Sikeres Feladatok</div>
+          <div class="stat-value text-success">{{resultData.successfulCloudlets}} / {{resultData.totalCloudlets}}</div>
+          <div class="stat-desc mt-1">Befejezett / Összes Cloudlet</div>
+        </div>
+        
+      </div>
 
-        <div class="h-64 flex items-center justify-center">
-          <div class="text-sm text-base-content/50">
-            Memory graph
+      <!-- GRAFIKONOK SZEKCIÓJA -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Oszlopdiagram (Futási idők) -->
+        <div class="card bg-base-100 shadow-md border border-base-300 p-6">
+          <canvas baseChart 
+                  [data]="barChartData" 
+                  [options]="barChartOptions" 
+                  [type]="barChartType">
+          </canvas>
+        </div>
+        
+        <!-- Fánkdiagram (VM Terheléseloszlás) -->
+        <div class="card bg-base-100 shadow-md border border-base-300 p-6 flex justify-center items-center">
+          <div class="w-full max-w-md">
+            <canvas baseChart 
+                    [data]="doughnutChartData" 
+                    [options]="doughnutChartOptions" 
+                    [type]="doughnutChartType">
+            </canvas>
           </div>
         </div>
+        
       </div>
-    </div>
 
-    <div class="card bg-base-100 shadow-sm border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-sm">
-          Execution Time
-        </h3>
-
-        <div class="h-64 flex items-center justify-center">
-          <div class="text-sm text-base-content/50">
-            Execution time graph
+      <!-- RÉSZLETES TÁBLÁZAT SZEKCIÓJA -->
+      <div class="card bg-base-100 shadow-md border border-base-300">
+        <div class="card-body">
+          <h3 class="card-title text-xl mb-4 border-b border-base-200 pb-2">Cloudletek Életciklusa (Részletes Adatok)</h3>
+          
+          <div class="overflow-x-auto">
+            <table class="table table-zebra table-md w-full text-center">
+              
+              <thead class="bg-base-200/50">
+                <tr>
+                  <th class="text-left text-base">Feladat ID</th>
+                  <th class="text-base">Hozzárendelt VM</th>
+                  <th class="text-base">Státusz</th>
+                  <th class="text-base">Kezdés (sec)</th>
+                  <th class="text-base">Befejezés (sec)</th>
+                  <th class="text-base">Futási Idő (sec)</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                @for (cl of resultData.cloudletResults; track cl.cloudletId) {
+                  <tr class="hover">
+                    <td class="text-left font-bold text-base-content/80">CL-{{cl.cloudletId}}</td>
+                    <td class="font-semibold text-primary">VM-{{cl.vmId}}</td>
+                    <td>
+                      <div class="badge badge-sm font-semibold p-3" 
+                           [class.badge-success]="cl.status === 'SUCCESS'"
+                           [class.badge-error]="cl.status === 'FAILED'">
+                        {{cl.status}}
+                      </div>
+                    </td>
+                    <td class="font-mono text-base-content/70">{{cl.startTime | number:'1.2-2'}}</td>
+                    <td class="font-mono text-base-content/70">{{cl.finishTime | number:'1.2-2'}}</td>
+                    <td class="font-mono font-bold">{{cl.execTime | number:'1.2-2'}}</td>
+                  </tr>
+                }
+              </tbody>
+              
+            </table>
           </div>
+          
         </div>
       </div>
+
     </div>
-
-    <div class="card bg-base-100 shadow-sm border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-sm">
-          VM Performance
-        </h3>
-
-        <div class="h-64 flex items-center justify-center">
-          <div class="text-sm text-base-content/50">
-            VM performance graph
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
+  }
 </div>

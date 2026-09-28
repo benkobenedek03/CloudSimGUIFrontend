@@ -9,6 +9,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RequestService } from '../../services/request-service';
+import { Router } from '@angular/router';
 
 
 
@@ -21,6 +22,7 @@ import { RequestService } from '../../services/request-service';
 export class DragAndDrop implements OnInit {
 
   private requestService = inject(RequestService);
+  private router = inject(Router)
 
   isLoading = signal(false);
 
@@ -111,7 +113,7 @@ export class DragAndDrop implements OnInit {
         next: (response) => {
           this.isLoading.set(false); // Siker esetén is leállítjuk a töltést
           console.log('Sikeres kérés:', response);
-          // TODO: Navigáció az eredmény (Result) oldalra
+          this.router.navigate(['results', response]);
         },
         
         // 2/B. Aszinkron Backend Hiba (pl. 400 Bad Request, 500 Internal Server Error)
@@ -119,7 +121,7 @@ export class DragAndDrop implements OnInit {
           this.isLoading.set(false);          
           // HTTP hibaüzenet intelligens kinyerése
           this.errorMessage = httpError.error?.message || httpError.message || 'Hiba történt a szerverrel való kommunikáció során.';
-          
+          this.router.navigate(['results', httpError]);
           this.errorModal.nativeElement.showModal();
         }
       });
