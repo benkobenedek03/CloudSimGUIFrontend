@@ -1,9 +1,9 @@
-import { Component, inject, input, OnInit } from '@angular/core';
 import { RequestService } from '../../services/request-service';
 import { ResultDto } from '../../Models/simulation-result-dto';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ChartConfiguration, ChartType } from 'chart.js';
+import { Component, OnInit, inject, ChangeDetectorRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
@@ -17,6 +17,10 @@ export class Result implements OnInit {
   private route = inject(ActivatedRoute);
   private requestService = inject(RequestService);
   
+  private cdr = inject(ChangeDetectorRef);
+
+  // 2. ÚJDONSÁG: Referencia a grafikonokhoz (mivel kettő van, a ViewChildren a biztos)
+  @ViewChildren(BaseChartDirective) charts?: QueryList<BaseChartDirective>;
 
   jobId: string | null = null;
   isLoading: boolean = true;
@@ -48,18 +52,18 @@ export class Result implements OnInit {
   };
 
   ngOnInit() {
-    // // Job ID kiolvasása az URL-ből (pl. /results/12345)
-    // this.jobId = this.route.snapshot.paramMap.get('jobId');
+    // Job ID kiolvasása az URL-ből (pl. /results/12345)
+    this.jobId = this.route.snapshot.paramMap.get('jobId');
 
-    // if (this.jobId) {
-    //   this.startPolling(this.jobId);
-    // } else {
-    //   this.errorMessage = 'Nem található Job ID az URL-ben!';
-    //   this.isLoading = false;
-    // }
+    if (this.jobId) {
+      this.startPolling(this.jobId);
+    } else {
+      this.errorMessage = 'Nem található Job ID az URL-ben!';
+      this.isLoading = false;
+    }
 
-    this.jobId = "job-demo-98765";
-    this.resultData = this.generateMockResult();
+    // this.jobId = "job-demo-98765";
+    // this.resultData = this.generateMockResult();
     
     // Feldolgozzuk az adatokat a Chart.js-nek
     this.processChartData(); 
@@ -99,9 +103,22 @@ export class Result implements OnInit {
   private fetchFinalResult(jobId: string) {
     this.requestService.getResult(jobId).subscribe({
       next: (data: ResultDto) => {
+        console.log('HTTP Válasz megérkezett:', data);
+        
+        // 1. Adat beállítása és feldolgozása
         this.resultData = data;
-        this.processChartData(); // Grafikon adatok kiszámolása
-        this.isLoading = false;  // Siker, betöltés vége!
+        this.processChartData(); 
+        
+        // 2. Töltőképernyő kikapcsolása
+        this.isLoading = false;  
+        
+        // 3. Kényszerítjük az Angulart, hogy frissítse a HTML-t (pl. levegye a loadert és megjelenítse a kártyákat)
+        this.cdr.detectChanges();
+
+        // 4. Kényszerítjük a Chart.js grafikonokat a frissítésre
+        if (this.charts) {
+          this.charts.forEach(chart => chart.update());
+        }
       },
       error: (err) => {
         this.errorMessage = 'A szimuláció lefutott, de az eredmény JSON letöltése sikertelen volt.';
@@ -109,6 +126,7 @@ export class Result implements OnInit {
         console.error('Result fetch hiba:', err);
       }
     });
+
   }
 
   // ADATFELDOLGOZÁS A CHART.JS SZÁMÁRA

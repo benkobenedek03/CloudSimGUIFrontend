@@ -63,7 +63,7 @@ export class DragAndDrop implements OnInit {
   addDatacenter() {
     this.datacenters.push({
       name: `Datacenter_${this.datacenters.length + 1}`,
-      costPerSec: 3.0, costPerMem: 0.05, costPerStorage: 0.001, costPerBw: 0.0,
+      costPerSec: 0.0000416, costPerMem: 0.05, costPerStorage: 0.001, costPerBw: 0.0,
       hosts: []
     });
   }
@@ -88,7 +88,7 @@ export class DragAndDrop implements OnInit {
 
   // --- WORKLOAD (BROKER) METÓDUSOK ---
   addVm() {
-    this.vms.push({ id: this.vms.length + 1, mips: 1000, pes: 2, ram: 2048, bw: 1000, size: 10000 });
+    this.vms.push({ id: this.vms.length + 1, mips: 1000, pes: 2, ram: 2048, bw: 1000, size: 10000, cloudletScheduler: 'TimeShared' });
   }
 
   addCloudlet() {
@@ -186,7 +186,7 @@ export class DragAndDrop implements OnInit {
     });
     this.datacenterForm = this.fb.group({
       name: [''],
-      costPerSec: [3.0],
+      costPerSec: [0.0000416],
       costPerMem: [0.05],
       costPerStorage: [0.001],
       costPerBw: [0.0]

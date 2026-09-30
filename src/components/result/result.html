@@ -22,7 +22,7 @@
       <button class="btn btn-sm" routerLink="/">Vissza a tervezőbe</button>
     </div>
   }
-  @else if (resultData) {
+  @else if (resultData && !isLoading) {
     <div class="w-full flex flex-col gap-8 fade-in">
       
       <!-- Fejléc -->
