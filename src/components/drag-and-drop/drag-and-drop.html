@@ -233,8 +233,16 @@
                     <select formControlName="vmScheduler" class="select select-bordered w-full">
                         <option value="TimeShared">Time-Shared (Időosztásos)</option>
                         <option value="SpaceShared">Space-Shared (Térosztásos)</option>
+                        <option value="Custom">Egyéni (Custom)</option>
                     </select>
                 </div>
+
+                @if (hostForm.get('vmScheduler')?.value === 'Custom') {
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label"><span class="label-text font-semibold">Egyéni ütemező osztály neve</span></label>
+                    <input type="text" formControlName="customSchedulerClass" class="input input-bordered w-full" required />
+                </div>
+                }
 
             </div>
 
@@ -294,8 +302,16 @@
                     <select formControlName="cloudletScheduler" class="select select-bordered w-full">
                         <option value="TimeShared">Time-Shared</option>
                         <option value="SpaceShared">Space-Shared</option>
+                        <option value="Custom">Custom</option>
                     </select>
                 </div>
+
+                @if (vmForm.get('cloudletScheduler')?.value === 'Custom') {
+                <div class="form-control w-full md:col-span-2">
+                    <label class="label"><span class="label-text font-semibold">Custom scheduler class name</span></label>
+                    <input type="text" formControlName="customSchedulerClass" class="input input-bordered w-full" required />
+                </div>
+                }
 
             </div>
 

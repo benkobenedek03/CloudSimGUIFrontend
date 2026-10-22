@@ -168,7 +168,8 @@ export class DragAndDrop implements OnInit {
       ram: [2048],
       bw: [10000],
       storage: [1000000],
-      vmScheduler: ['TimeShared']
+      vmScheduler: ['TimeShared'],
+      customSchedulerClass: ['']
     });
     this.vmForm = this.fb.group({
       pes: [2],
@@ -176,7 +177,8 @@ export class DragAndDrop implements OnInit {
       ram: [2048],
       bw: [1000],
       size: [10000],
-      cloudletScheduler: ['TimeShared']
+      cloudletScheduler: ['TimeShared'],
+      customSchedulerClass: ['']
     });
     this.cloudletForm = this.fb.group({
       length: [50000],
@@ -207,6 +209,9 @@ export class DragAndDrop implements OnInit {
   saveVmSettings() {
     if (this.selectedVm && this.vmForm.valid) {
       Object.assign(this.selectedVm, this.vmForm.value);
+      if (this.selectedVm.cloudletScheduler !== 'Custom') {
+        this.selectedVm.customSchedulerClass = undefined;
+      }
       this.closeVmModal();
     }
   }
@@ -248,6 +253,9 @@ export class DragAndDrop implements OnInit {
     if (this.selectedHost && this.hostForm.valid) {
       // Frissítjük a memóriában lévő objektumot az űrlap adataival
       Object.assign(this.selectedHost, this.hostForm.value);
+      if (this.selectedHost.vmScheduler !== 'Custom') {
+        this.selectedHost.customSchedulerClass = undefined;
+      }
       this.closeModal();
     }
   }

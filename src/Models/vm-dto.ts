@@ -6,4 +6,5 @@ export interface VmDTO {
   bw: number;
   size: number;
   cloudletScheduler?: string;
+  customSchedulerClass?: string;
 }
