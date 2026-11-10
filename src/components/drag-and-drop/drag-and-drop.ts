@@ -7,7 +7,7 @@ import { CloudletDTO } from '../../Models/cloudlet-dto';
 import { CdkDragDrop, moveItemInArray, copyArrayItem } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RequestService } from '../../services/request-service';
 import { Router } from '@angular/router';
 
@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-drag-and-drop',
-  imports: [DragDropModule, ReactiveFormsModule],
+  imports: [DragDropModule, FormsModule, ReactiveFormsModule],
   templateUrl: './drag-and-drop.html',
   styleUrl: './drag-and-drop.css',
 })
@@ -25,6 +25,7 @@ export class DragAndDrop implements OnInit {
   private router = inject(Router)
 
   isLoading = signal(false);
+  simulationName = '';
 
   ngOnInit(): void {
     this.displayDataCenter = this.defaultDataCenter;
@@ -92,7 +93,11 @@ export class DragAndDrop implements OnInit {
   }
 
   addCloudlet() {
-    this.cloudlets.push({ id: this.cloudlets.length + 1, length: 50000, pes: 1, fileSize: 300, outputSize: 300 });
+    let length= Math.floor(Math.random() * (100000 - 10000 + 1)) + 10000; // Random length between 10,000 and 100,000
+    let fileSize= Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
+    let pes= Math.floor(Math.random() * (4 - 1 + 1)) + 1; // Random pes between 1 and 4
+    let outputSize= Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
+    this.cloudlets.push({ id: this.cloudlets.length + 1, length: length, pes: pes, fileSize: fileSize, outputSize: outputSize });
   }
 
   // --- SZIMULÁCIÓ INDÍTÁSA (Szerializáció) ---
@@ -134,6 +139,51 @@ export class DragAndDrop implements OnInit {
       
       // Hiba popup megjelenítése a frontend validáció miatt
       this.errorModal.nativeElement.showModal();
+    }
+  }
+
+
+  public saveSimulation() {
+    try {
+      let req:DetailedRequestDto = {
+        datacenters: this.datacenters,
+        vms: this.vms,
+        cloudlets: this.cloudlets
+      };
+      const confString = JSON.stringify(req, null, 2);
+      if(this.simulationName ==='') 
+        {
+          alert('Kérlek adj meg egy nevet a szimulációnak a mentéshez!');
+          return;
+        }
+      localStorage.setItem(this.simulationName, confString);
+    } catch (error) {
+      console.error('Hiba történt a szimuláció mentése során:', error);
+    }
+  }
+
+  public loadSimulation() {
+    if (this.simulationName === '') {
+      alert('Kérlek adj meg egy nevet a betöltendő szimulációnak!');
+      return;
+    }
+
+    const savedSimulation = localStorage.getItem(this.simulationName);
+    if (savedSimulation === null) {
+      alert('Nem található mentett szimuláció ezzel a névvel.');
+      return;
+    }
+
+    try {
+      const parsed: DetailedRequestDto = JSON.parse(savedSimulation);
+      
+
+      this.datacenters = parsed.datacenters;
+      this.vms = parsed.vms;
+      this.cloudlets = parsed.cloudlets;
+    } catch (error) {
+      console.error('Hiba történt a szimuláció betöltése során:', error);
+      alert('A szimuláció betöltése nem sikerült, mert a mentett adat érvénytelen.');
     }
   }
 
