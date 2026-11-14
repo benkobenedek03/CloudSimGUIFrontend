@@ -14,8 +14,8 @@
   width: 50px;
   height: 50px;
 
-  border: 5px solid #e0e0e0;
-  border-top: 5px solid #3f51b5;
+  border: 5px solid var(--color-base-300);
+  border-top: 5px solid var(--color-primary);
 
   border-radius: 50%;
 

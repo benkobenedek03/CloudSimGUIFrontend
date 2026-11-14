@@ -1,59 +1,74 @@
-# Frontend
+# CloudSim Web – frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.22.
+Ez a repository a CloudSim-alapú szimulációs rendszer Angular frontendje. Az
+alkalmazás célja, hogy a felhasználó böngészőből összeállíthassa a
+szimulációhoz szükséges fizikai infrastruktúrát és logikai terhelést, a
+konfigurációt a backendnek elküldhesse, majd a futás eredményét grafikus és
+táblázatos formában megtekinthesse.
 
-## Development server
+## Aktuális funkcionalitás
 
-To start a local development server, run:
+- vizuális, drag-and-drop alapú szimulációtervező;
+- adatközpontok és fizikai hostok felvétele;
+- virtuális gépek és cloudletek létrehozása és paraméterezése;
+- CloudSim ütemezők kiválasztása, illetve egyéni ütemezőosztály megadása;
+- kliensoldali konfiguráció-ellenőrzés;
+- konfiguráció mentése és betöltése böngészőből (`localStorage`);
+- szimuláció indítása HTTP API-n keresztül;
+- futási állapot lekérdezése és eredmény-megjelenítés;
+- KPI-k, cloudletenkénti futási adatok, oszlopdiagram és fánkdiagram;
+- világos és sötét megjelenítési téma.
 
-```bash
-ng serve
-```
+A részletes tervezési és implementációs leírás a
+[docs/drag-and-drop-component.md](docs/drag-and-drop-component.md) fájlban
+található. A dokumentum szakdolgozati fejezetek alapjaként is használható.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Technológiai háttér
 
-## Code scaffolding
+- Angular 21 és standalone komponensek;
+- TypeScript;
+- Angular Router és Angular Dependency Injection;
+- Angular CDK Drag and Drop;
+- Angular Forms és Reactive Forms;
+- RxJS;
+- Chart.js és `ng2-charts`;
+- Tailwind CSS és DaisyUI;
+- Vitest az Angular unit teszteléséhez.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Futtatás
 
 ```bash
-ng test
+npm install
+npm start
 ```
 
-## Running end-to-end tests
+Az alkalmazás alapértelmezés szerint a `http://localhost:4200/` címen érhető
+el. A backendnek a `http://localhost:8080` címen kell futnia, és biztosítania
+kell az alábbi végpontokat:
 
-For end-to-end (e2e) testing, run:
+```text
+POST /api/simulation/start
+GET  /api/simulation/status/{jobId}
+GET  /api/simulation/result/{jobId}
+```
+
+## Build és teszt
 
 ```bash
-ng e2e
+npm run build
+npm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Az `npm run build` production buildet készít a `dist/` könyvtárban. Az
+`npm test` a projektben definiált unit teszteket futtatja.
 
-## Additional Resources
+## Aktív útvonalak
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Útvonal | Komponens | Funkció |
+| --- | --- | --- |
+| `/` | `DragAndDrop` | Szimuláció összeállítása és indítása |
+| `/results/:jobId` | `Result` | Futási állapot és eredmény megjelenítése |
+
+Az egyszerű konfigurációs és a szöveges részletes konfigurációs komponens
+forráskódja jelen van, de a jelenlegi route-konfiguráció nem rendeli ezeket
+aktív útvonalhoz.
