@@ -172,9 +172,15 @@
         <div class="flex flex-col sm:flex-row sm:items-end justify-end gap-4 mt-4 pb-8">
             <label class="form-control w-full sm:w-64">
                 <span class="label-text font-semibold mb-2">Szimuláció neve</span>
-                <input type="text" class="input input-bordered w-full" placeholder="Szimuáláció neve"
+                <input type="text" list="saved-simulations" class="input input-bordered w-full"
+                    placeholder="Szimuáláció neve"
                     [(ngModel)]="simulationName" [ngModelOptions]="{ standalone: true }" />
-            </label>
+                <datalist id="saved-simulations">
+                    @for (savedKey of savedSimulationKeys(); track savedKey) {
+                    <option [value]="savedKey"></option>
+                    }
+                </datalist>
+            </label>            
             <button (click)="saveSimulation()"
                 class="btn btn-success btn-lg shadow-lg shadow-success/30 hover:scale-105 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">

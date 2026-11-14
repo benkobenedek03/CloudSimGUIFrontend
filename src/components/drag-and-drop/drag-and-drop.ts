@@ -26,9 +26,12 @@ export class DragAndDrop implements OnInit {
 
   isLoading = signal(false);
   simulationName = '';
+  savedSimulationKeys = signal<string[]>([]);
+  private readonly simulationStoragePrefix = 'cloudsim:simulation:';
 
   ngOnInit(): void {
     this.displayDataCenter = this.defaultDataCenter;
+    this.refreshSavedSimulationKeys();
   }
 
   defaultDataCenter: DatacenterDTO = {
@@ -151,12 +154,15 @@ export class DragAndDrop implements OnInit {
         cloudlets: this.cloudlets
       };
       const confString = JSON.stringify(req, null, 2);
-      if(this.simulationName ==='') 
+      const simulationName = this.simulationName.trim();
+      if(simulationName === '')
         {
           alert('Kérlek adj meg egy nevet a szimulációnak a mentéshez!');
           return;
         }
-      localStorage.setItem(this.simulationName, confString);
+      localStorage.setItem(this.getSimulationStorageKey(simulationName), confString);
+      this.simulationName = simulationName;
+      this.refreshSavedSimulationKeys();
     } catch (error) {
       console.error('Hiba történt a szimuláció mentése során:', error);
     }
@@ -164,11 +170,11 @@ export class DragAndDrop implements OnInit {
 
   public loadSimulation() {
     if (this.simulationName === '') {
-      alert('Kérlek adj meg egy nevet a betöltendő szimulációnak!');
+      alert('Kérlek válassz ki egy mentett szimulációt!');
       return;
     }
 
-    const savedSimulation = localStorage.getItem(this.simulationName);
+    const savedSimulation = localStorage.getItem(this.getSimulationStorageKey(this.simulationName));
     if (savedSimulation === null) {
       alert('Nem található mentett szimuláció ezzel a névvel.');
       return;
@@ -176,8 +182,6 @@ export class DragAndDrop implements OnInit {
 
     try {
       const parsed: DetailedRequestDto = JSON.parse(savedSimulation);
-      
-
       this.datacenters = parsed.datacenters;
       this.vms = parsed.vms;
       this.cloudlets = parsed.cloudlets;
@@ -185,6 +189,19 @@ export class DragAndDrop implements OnInit {
       console.error('Hiba történt a szimuláció betöltése során:', error);
       alert('A szimuláció betöltése nem sikerült, mert a mentett adat érvénytelen.');
     }
+  }
+
+  private getSimulationStorageKey(simulationName: string): string {
+    return `${this.simulationStoragePrefix}${simulationName}`;
+  }
+
+  private refreshSavedSimulationKeys(): void {
+    const savedKeys = Object.keys(localStorage)
+      .filter(key => key.startsWith(this.simulationStoragePrefix))
+      .map(key => key.slice(this.simulationStoragePrefix.length))
+      .sort((first, second) => first.localeCompare(second));
+
+    this.savedSimulationKeys.set(savedKeys);
   }
 
 
